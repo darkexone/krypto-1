@@ -181,6 +181,25 @@ public class GUI implements ActionListener, DocumentListener {
     public void actionPerformed(ActionEvent e) {
 
         String s = e.getActionCommand();
+
+        if (s == "DESZYFRUJ" || s == "SZYFRUJ") {
+            if (kluczText.getText().length()!=16) {
+                JOptionPane.showMessageDialog(null,
+                        "Podano niepoprawny klucz, wpisana wartość musi składać się z dwóch kluczy o długości 8 bajtów.\nObecnie ma długość: "
+                                + kluczText.getText().length(),"Ostrzeżenie",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            else {
+                try {
+                    klucz = kluczText.getText().getBytes("UTF-8");
+                    System.out.println(new String(klucz));
+                } catch (UnsupportedEncodingException unsupportedEncodingException) {
+                    unsupportedEncodingException.printStackTrace();
+                }
+            }
+        }
+
         switch (s) {
             case "DESZYFRUJ": {
                 if (mode == 1) {
