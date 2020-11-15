@@ -24,6 +24,7 @@ public class GUI implements ActionListener, DocumentListener {
     JTextArea szyfrogramTextArea;
     JButton selectSzyfrFileButton;
 
+    public byte [] klucz;
     public byte [] tekst;// = null;
     public byte [] szyfr;// = null;
     String pathToFile;
