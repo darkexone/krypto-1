@@ -6,10 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.charset.Charset;
-<<<<<<< Updated upstream
-=======
 import java.nio.charset.StandardCharsets;
->>>>>>> Stashed changes
 
 public class GUI implements ActionListener, DocumentListener {
     JFrame frame;
@@ -180,14 +177,6 @@ public class GUI implements ActionListener, DocumentListener {
     }
 
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-<<<<<<< Updated upstream
-    public static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-=======
 
     public static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 3];
@@ -196,29 +185,10 @@ public class GUI implements ActionListener, DocumentListener {
             hexChars[j * 3] = HEX_ARRAY[v >>> 4];
             hexChars[j * 3 + 1] = HEX_ARRAY[v & 0x0F];
             hexChars[j * 3 + 2] = ' ';
->>>>>>> Stashed changes
         }
         return new String(hexChars);
     }
 
-<<<<<<< Updated upstream
-    public static byte[] hexToBytes(String tekst)
-    {
-        if (tekst == null) { return null;}
-        else if (tekst.length() < 2) { return null;}
-        else { if (tekst.length()%2!=0)tekst+='0';
-            int dl = tekst.length() / 2;
-            byte[] wynik = new byte[dl];
-            for (int i = 0; i < dl; i++)
-            { try{
-                wynik[i] = (byte) Integer.parseInt(tekst.substring(i * 2, i * 2 + 2), 16);
-            }catch(NumberFormatException e){JOptionPane.showMessageDialog(null, "Problem z przekonwertowaniem HEX->BYTE.\n Sprawdź wprowadzone dane.", "Problem z przekonwertowaniem HEX->BYTE", JOptionPane.ERROR_MESSAGE); }
-            }
-            return wynik;
-        }
-    }
-
-=======
     private void printByteArray(byte[] bytes) {
         for (byte b1 : bytes) {
             String s1 = String.format("%8s", Integer.toBinaryString(b1 & 0xFF)).replace(' ', '0');
@@ -226,7 +196,6 @@ public class GUI implements ActionListener, DocumentListener {
         }
         System.out.println();
     }
->>>>>>> Stashed changes
 
 
     @Override
@@ -243,28 +212,16 @@ public class GUI implements ActionListener, DocumentListener {
                 return;
             }
             else {
-<<<<<<< Updated upstream
-                try {
-                    klucz = kluczText.getText().getBytes("UTF-8");
-=======
                 //try {
                     klucz = kluczText.getText().getBytes(StandardCharsets.UTF_8);
->>>>>>> Stashed changes
                     //klucz = hexToBytes(kluczText.getText().toString());
                     //for (int i = 0; i < 16; i++) {
                         //System.out.println("klucz["+i+"]="+klucz[i]);
                     //}
-<<<<<<< Updated upstream
-                    System.out.println(new String(klucz));
-                } catch (UnsupportedEncodingException unsupportedEncodingException) {
-                    unsupportedEncodingException.printStackTrace();
-                }
-=======
                     //System.out.println(new String(klucz));
                 //} catch (UnsupportedEncodingException unsupportedEncodingException) {
                 //    unsupportedEncodingException.printStackTrace();
                 //}
->>>>>>> Stashed changes
             }
         }
 
@@ -300,22 +257,6 @@ public class GUI implements ActionListener, DocumentListener {
                 //klucz = hexToBytes(kluczText.getText());//TODO to powinno działać
                 Key kluczyk = new Key(klucz);
                 Subkeys podklucze = new Subkeys(kluczyk);
-                System.out.println("pobrany key: " + new String(klucz));
-                System.out.println("podklucz 64: " + bytesToHex(kluczyk.get64Key()));
-                System.out.println("podklucz 56: " + bytesToHex(kluczyk.get56Key()));
-                System.out.println("podklucz 64 ma dlugosc: " + kluczyk.get64Key().length);
-                System.out.println("podklucz 56 ma dlugosc: " + kluczyk.get56Key().length);
-                for (int i = 0; i < 9; i++) {
-                    System.out.println("podklucz  " + (i + 1) + ": " + bytesToHex(podklucze.getSubKey(i)));
-                }
-                for (int i = 9; i < 16; i++) {
-                    System.out.println("podklucz " + (i + 1) + ": " + bytesToHex(podklucze.getSubKey(i)));
-                }
-
-<<<<<<< Updated upstream
-=======
-                Key kluczyk = new Key(klucz);
-                Subkeys podklucze = new Subkeys(kluczyk);
 
                 System.out.println("\n\nwpisany tekst klucza z JText:  " + new String(klucz));
                 //klucz = hexToBytes(kluczText.getText());//TODO to powinno działać
@@ -340,8 +281,6 @@ public class GUI implements ActionListener, DocumentListener {
                     System.out.print("podklucz " + (i + 1) + ": " + bytesToHex(podklucze.getSubKey(i)) + " ");
                     printByteArray(podklucze.getSubKey(i));
                 }
-
->>>>>>> Stashed changes
                 break;
             }
 

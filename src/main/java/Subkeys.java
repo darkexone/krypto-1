@@ -10,11 +10,7 @@ public class Subkeys {
             Key.setBit(this.c, i, Key.getBit(mainKey.get56Key(), i));
             Key.setBit(this.d, i, Key.getBit(mainKey.get56Key(), 28 + i));
         }
-<<<<<<< Updated upstream
-        System.out.println("wartosci kolejnych podkluczy:");
-=======
         //System.out.println("wartosci kolejnych podkluczy:");
->>>>>>> Stashed changes
         for (int i = 0; i < 16; i++) {
             setSubKey(getShiftedAndJoinedSubKey56(i),i);
         }
@@ -74,11 +70,7 @@ public class Subkeys {
         this.c = cShifted;
         this.d = dShifted;
         //System.out.println("podklucz po rundzie " + (round + 1) + ":");
-<<<<<<< Updated upstream
-        printByteArray(out);
-=======
         //printByteArray(out);
->>>>>>> Stashed changes
         return out;
     }
 
