@@ -5,11 +5,15 @@ public class Key {
 
     public Key(byte [] key) {
         set64Key(key);
+<<<<<<< Updated upstream
         System.out.println("wartosc key64 po pobraniu:");
         printByteArray(key64);
         set56Key();
         System.out.println("wartosc key56 po set56Key():");
         printByteArray(key56);
+=======
+        set56Key();
+>>>>>>> Stashed changes
     }
 
     private void printByteArray(byte[] bytes) {
