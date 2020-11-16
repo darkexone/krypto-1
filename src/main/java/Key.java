@@ -8,31 +8,27 @@ public class Key {
         set56Key();
     }
 
-    private void printByteArray(byte[] bytes) {
-        for (byte b1 : bytes) {
-            String s1 = String.format("%8s", Integer.toBinaryString(b1 & 0xFF)).replace(' ', '0');
-            System.out.print(s1 + " ");
-        }
-        System.out.println();
-    }
-
     private void set56Key() {
         for (int i = 0; i < 56; i++) {
-                setBit(key56, i, getBit(key64, PC1[i]));
+                setBit(key56, i, getBit(key64, PC1[i] - 1));
         }
+    }
+
+    public void set56Key(byte [] keyHEHE) {
+        this.key56 = keyHEHE;
     }
 
     public static int getBit(byte[] data, int pos) {
         int posByte = pos / 8;
         int posBit = pos % 8;
         byte valByte = data[posByte];
-        int valInt = valByte >> ( 7 - posBit) & 1;
+        int valInt = valByte >> (7 - posBit) & 1; // dobra zarzutka
         return valInt;
     }
 
     public static void setBit(byte[] data, int pos, int oneOrZero) {
         int posByte = pos / 8;
-        int posBit = pos % 8;
+        int posBit = (7 - (pos % 8));
         if (oneOrZero == 1) {               // set 1
             data[posByte] |= (1 << posBit); //TODO XDDDDDDDDDDDDDDD
         }

@@ -13,7 +13,7 @@ public class GUI implements ActionListener, DocumentListener {
     JPanel panel;
 
     JLabel kluczLabel;
-    JTextField kluczText;
+    JTextField kluczTextField;
 
     JLabel tekstLabel;
     JScrollPane tekstScrollPane;
@@ -25,9 +25,9 @@ public class GUI implements ActionListener, DocumentListener {
     JTextArea szyfrogramTextArea;
     JButton selectSzyfrFileButton;
 
-    public byte [] klucz;// = new byte[8];
-    public byte [] tekst;// = null;
-    public byte [] szyfr;// = null;
+    public byte [] klucz;
+    public byte [] tekst;
+    public byte [] szyfr;
     String pathToFile;
 
     JButton szyfrujButton;
@@ -59,9 +59,9 @@ public class GUI implements ActionListener, DocumentListener {
         panel.add(kluczLabel);
         //TODO wczytanie klucza
 
-        kluczText = new JTextField(20);
-        kluczText.setBounds(103,20,500,25);
-        panel.add(kluczText);
+        kluczTextField = new JTextField(20);
+        kluczTextField.setBounds(103,20,500,25);
+        panel.add(kluczTextField);
 
         // tekst
         tekstLabel = new JLabel("Tekst: ");
@@ -118,8 +118,6 @@ public class GUI implements ActionListener, DocumentListener {
     }
 
 
-
-
     public static void main(String [] args) {
         //GUI gui = new GUI();
         new GUI();
@@ -144,8 +142,6 @@ public class GUI implements ActionListener, DocumentListener {
             text = new byte[is.available()];
             is.read(text);
             is.close();
-            //System.out.println(new String(text));
-            //area.read( br, null );
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
@@ -189,12 +185,22 @@ public class GUI implements ActionListener, DocumentListener {
         return new String(hexChars);
     }
 
-    private void printByteArray(byte[] bytes) {
-        for (byte b1 : bytes) {
-            String s1 = String.format("%8s", Integer.toBinaryString(b1 & 0xFF)).replace(' ', '0');
-            System.out.print(s1 + " ");
+    public static byte[] hexToBytes(String tekst)
+    {
+        if (tekst == null) { return null;}
+        else if (tekst.length() < 2) { return null;}
+        else { if (tekst.length()%2!=0)tekst+='0';
+            int dl = tekst.length() / 2;
+            System.out.println("Dlugosc tekstu: " + tekst.length());
+            byte[] wynik = new byte[dl];
+            for (int i = 0; i < dl; i++)
+            { try {
+                wynik[i] = (byte) Integer.parseInt(tekst.substring(i * 2, i * 2 + 2), 16);
+            } catch(NumberFormatException e){
+                System.out.println("Problem z przekonwertowaniem HEX->BYTE.\n Sprawdź wprowadzone dane."); }
+            }
+            return wynik;
         }
-        System.out.println();
     }
 
 
@@ -204,27 +210,17 @@ public class GUI implements ActionListener, DocumentListener {
         String s = e.getActionCommand();
 
         if (s == "DESZYFRUJ" || s == "SZYFRUJ") {
-            if (kluczText.getText().length()!=8) {//TODO POPRAWIC ZNOWU NA ROZNY
+            if (kluczTextField.getText().length()!=8) {//TODO POPRAWIC ZNOWU NA ROZNY
                 JOptionPane.showMessageDialog(null,
                         "Podano niepoprawny klucz, wpisana wartość musi składać się z dwóch kluczy o długości 8 bajtów każdy.\nObecnie ma długość: "
-                                + kluczText.getText().length(),"Ostrzeżenie",
+                                + kluczTextField.getText().length(),"Ostrzeżenie",
                         JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
             else {
-                //try {
-                    klucz = kluczText.getText().getBytes(StandardCharsets.UTF_8);
-                    //klucz = hexToBytes(kluczText.getText().toString());
-                    //for (int i = 0; i < 16; i++) {
-                        //System.out.println("klucz["+i+"]="+klucz[i]);
-                    //}
-                    //System.out.println(new String(klucz));
-                //} catch (UnsupportedEncodingException unsupportedEncodingException) {
-                //    unsupportedEncodingException.printStackTrace();
-                //}
+                    klucz = kluczTextField.getText().getBytes(StandardCharsets.UTF_8);
             }
         }
-
 
 
         switch (s) {
@@ -240,47 +236,16 @@ public class GUI implements ActionListener, DocumentListener {
             }
 
             case "SZYFRUJ": {
+
                 if (mode == 1) {
                     break;
                 }
                 else {
                     tekst = tekstTextArea.getText().getBytes(Charset.defaultCharset());
                 }
-                for (int i = 0; i < 64; i++) {
-                    if (i%2 == 0) {
-                        //Key.setBit(klucz, i,1);
-                    }
-                    else {
-                        //Key.setBit(klucz, i,1);
-                    }
-                }
-                //klucz = hexToBytes(kluczText.getText());//TODO to powinno działać
+
                 Key kluczyk = new Key(klucz);
-                Subkeys podklucze = new Subkeys(kluczyk);
-
-                System.out.println("\n\nwpisany tekst klucza z JText:  " + new String(klucz));
-                //klucz = hexToBytes(kluczText.getText());//TODO to powinno działać
-                System.out.println("HEX klucza z JText:            " + bytesToHex(klucz));
-                System.out.print("BIN klucza z JText:            ");
-                printByteArray(klucz);
-                System.out.print("BIN key64 po pobraniu:         ");
-                printByteArray(kluczyk.get64Key());
-                System.out.print("BIN key56 po set56Key():       ");
-                printByteArray(kluczyk.get56Key());
-
-                //System.out.println("\npobrany key: " + new String(klucz));
-                System.out.println("\nHEX key64:        " + bytesToHex(kluczyk.get64Key()));
-                System.out.println("HEX key56:        " + bytesToHex(kluczyk.get56Key()));
-                System.out.println("key64 ma dlugosc: " + kluczyk.get64Key().length);
-                System.out.println("key56 ma dlugosc: " + kluczyk.get56Key().length + "\n");
-                for (int i = 0; i < 9; i++) {
-                    System.out.print("podklucz  " + (i + 1) + ": " + bytesToHex(podklucze.getSubKey(i)) + " ");
-                    printByteArray(podklucze.getSubKey(i));
-                }
-                for (int i = 9; i < 16; i++) {
-                    System.out.print("podklucz " + (i + 1) + ": " + bytesToHex(podklucze.getSubKey(i)) + " ");
-                    printByteArray(podklucze.getSubKey(i));
-                }
+                Subkeys podklucze = new Subkeys(kluczyk); //TODO przekazywać klucz jako poprawną tablicę bajtów
                 break;
             }
 

@@ -1,4 +1,6 @@
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 
 public class keysTest {
@@ -45,10 +47,8 @@ public class keysTest {
         }
 
         //klucz = "☺☻♥♦♣♠•◘".getBytes(Charset.defaultCharset());
-        klucz = hexToBytes(("7F7F7F7F7F7F7F7F"));
-        byte [] podklucz = hexToBytes(("0000000FFFFFFF"));
         System.out.println("Charset: " + Charset.defaultCharset());
-
+        klucz = hexToBytes(("7F7F7F7F7F7F7F7F"));
 
         Key kluczyk = new Key(klucz);
         Subkeys podklucze = new Subkeys(kluczyk);

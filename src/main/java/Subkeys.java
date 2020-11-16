@@ -10,67 +10,35 @@ public class Subkeys {
             Key.setBit(this.c, i, Key.getBit(mainKey.get56Key(), i));
             Key.setBit(this.d, i, Key.getBit(mainKey.get56Key(), 28 + i));
         }
-        //System.out.println("wartosci kolejnych podkluczy:");
+
+        //System.out.println("Podklucz c:                    " + GUI.bytesToHex(c));
+        //System.out.println("Podklucz d:                    " + GUI.bytesToHex(d));
         for (int i = 0; i < 16; i++) {
-            setSubKey(getShiftedAndJoinedSubKey56(i),i);
+            setSubKey(getShiftedAndJoinedSubKey56(i), i);
         }
     }
 
-    public static byte[] rotateLeft(byte[] in, int len, int step)
+    public static byte[] rotateLeft(byte[] in, int step)
     {
-        byte[] out = new byte[(len - 1) / 8 + 1];
-        for (int i = 0; i < len; i++)
-        {
-            int val = Key.getBit(in, (i + step) % len);
-            Key.setBit(out, i, val);
-        }
-        return out;
-    }
-
-    private void printByteArray(byte[] bytes) {
-        for (byte b1 : bytes) {
-            String s1 = String.format("%8s", Integer.toBinaryString(b1 & 0xFF)).replace(' ', '0');
-            System.out.print(s1 + " ");
-        }
-        System.out.println();
-    }
-
-    private byte[] joinBlocks(byte[] a, int aLen, byte[] b, int bLen)
-    {
-        int numOfBytes = (aLen + bLen - 1) / 8 + 1;
-        byte[] out = new byte[numOfBytes];
-        int j = 0;
-        for (int i = 0; i < aLen; i++)
-        {
-            int val = Key.getBit(a, i);
-            Key.setBit(out, j, val);
-            j++;
-        }
-        for (int i = 0; i < bLen; i++)
-        {
-            int val = Key.getBit(b, i);
-            Key.setBit(out, j, val);
-            j++;
+        byte[] out = new byte[4];
+        for (int i = 0; i < 28; i++) {
+            Key.setBit(out, i, Key.getBit(in, (i + step) % 28));
         }
         return out;
     }
 
     private byte [] getShiftedAndJoinedSubKey56(int round) {
-        byte[] out;// = new byte[7];
-        byte[] cShifted = rotateLeft(c,28,1);
-        byte[] dShifted = rotateLeft(d,28,1);
+        byte[] out = new byte[7];
+        byte[] cShifted = rotateLeft(c,SHIFTS[round]);
+        byte[] dShifted = rotateLeft(d,SHIFTS[round]);
 
-        //for (int i = 0; i < 28; i++) {
-            //Key.setBit(out, i, Key.getBit(cShifted, i));
-            //Key.setBit(out,i + 28, Key.getBit(dShifted, i));
-        //}
-
-        out = joinBlocks(cShifted,28,dShifted,28);
+        for (int i = 0; i < 28; i++) {
+            Key.setBit(out, i, Key.getBit(cShifted, i));
+            Key.setBit(out,i + 28, Key.getBit(dShifted, i));
+        }
 
         this.c = cShifted;
         this.d = dShifted;
-        //System.out.println("podklucz po rundzie " + (round + 1) + ":");
-        //printByteArray(out);
         return out;
     }
 
