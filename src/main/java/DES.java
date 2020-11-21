@@ -4,8 +4,10 @@ public class DES {
     byte[][][] blocks32bit;
     Subkeys podklucze;
     byte[] tekst;
+    byte[] result;
+    byte [][] old = new byte[2][4];
 
-    public DES(Subkeys podklucze, byte[] tekst) {
+    public DES(Subkeys podklucze, byte[] tekst, int decrypt) {
         this.podklucze = podklucze;
         this.tekst = tekst;
 
@@ -20,6 +22,7 @@ public class DES {
                 }
             }
         }
+
         for (int i = 0; i < pom; i++) {
             byte[] block64bit_pom = new byte[8];
             for (int j = 0; j < 64; j++) {
@@ -33,15 +36,47 @@ public class DES {
                 blocks32bit[i][0][j] = block64bit[i][j];
                 blocks32bit[i][1][j] = block64bit[i][j + 4];
             }
-        }
-        byte [][] old = runda(blocks32bit[0][0], blocks32bit[0][1], 0);
+            //bloki sa dobrze
+            old[0] = blocks32bit[i][0];
+            old[1] = blocks32bit[i][1];
+            szyfrowanie(decrypt);
 
-        for (int i = 1; i < 16; i++) {
-            old = runda(old[0],old[1],i);
-        }
+            for (int j = 0; j < 4; j++) {
+                block64bit[i][j] = old[1][j];
+                block64bit[i][j+4] = old[0][j];
+            }
 
-        //TODO napisac permutacje po tablicy IPplus
-        //TODO klasa chyba powinna tez zwrocic tekst
+            byte [] block64bit_pom = new byte[8];
+            for (int j = 0; j < 64; j++) {
+                Key.setBit(block64bit_pom, j, Key.getBit(block64bit[i], IPplus[j] - 1));
+            }
+            block64bit[i] = block64bit_pom;
+
+        }
+        byte [] out = new byte[pom * 8];
+        for (int i = 0; i < pom * 8; i++) {
+            out[i] = block64bit[i / 8][i % 8];
+        }
+        result = out;
+    }
+
+    void szyfrowanie (int decrypt) {
+        if (decrypt == 0) {
+
+            for (int j = 0; j < 16; j++) {
+                old = runda(old[0],old[1],j);
+            }
+        }
+        else {
+
+            for (int j = 15; j > -1; j--) {
+                old = runda(old[0], old[1], j);
+            }
+        }
+    }
+
+    public byte[] getResult() {
+        return result;
     }
 
     int XORint (byte x, int xpos, byte y, int ypos) {
@@ -54,9 +89,13 @@ public class DES {
 
     byte[][] runda(byte[] l, byte[] r, int runda) {
         byte[] array48 = new byte[6];
+
         for (int j = 0; j < 48; j++) {
             Key.setBit(array48, j, Key.getBit(r, PC3[j] - 1));
-            Key.setBit(array48, j, XORint(array48[j / 8],j % 8, podklucze.getSubKey(runda)[j / 8],j %8 ));
+        }
+
+        for (int j = 0; j < 48; j++) {
+            Key.setBit(array48, j, XORint(array48[j / 8],j % 8, podklucze.getSubKey(runda)[j / 8],j % 8));
         }
 
         byte [] sboxtab = new byte[4];
@@ -70,10 +109,18 @@ public class DES {
             Key.setBit(y,6, Key.getBit(array48,i + 3));
             Key.setBit(y,7, Key.getBit(array48,i + 4));
 
+
             for (int j = 4; j < 8; j++) {
-                Key.setBit(sboxtab, j, (SBoxes[i/6][x[0]][y[0]] >> (7 - j) & 1));
+                Key.setBit(sboxtab, ((i / 6) * 4) + j - 4, (SBoxes[i/6][x[0]][y[0]] >> (7 - j) & 1));
             }
+
         }
+
+        byte [] sboxtab_pom = new byte[4];
+        for (int j = 0; j < 32; j++) {
+            Key.setBit(sboxtab_pom, j, Key.getBit(sboxtab,PBox[j]-1));
+        }
+        sboxtab = sboxtab_pom;
 
         byte [][] out = new byte[2][4];
         for (int i = 0; i < 4; i++) {
@@ -167,4 +214,15 @@ public class DES {
                     {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}
             }
     };
+
+    byte[] PBox = new byte[] {
+                16, 7, 20, 21,
+                29, 12, 28, 17,
+                1, 15, 23, 26,
+                5, 18, 31, 10,
+                2, 8, 24, 14,
+                32, 27, 3, 9,
+                19, 13, 30, 6,
+                22, 11, 4, 25};
+
 }
