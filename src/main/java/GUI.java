@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -210,7 +211,8 @@ public class GUI implements ActionListener, DocumentListener {
         String s = e.getActionCommand();
 
         if (s == "DESZYFRUJ" || s == "SZYFRUJ") {
-            if (kluczTextField.getText().length()!=8) {//TODO POPRAWIC ZNOWU NA ROZNY
+            String kluczHexString = String.format("%x", new BigInteger(1, kluczTextField.getText().getBytes(Charset.defaultCharset())));
+            if (kluczHexString.length() != 16) {//TODO ZMIENIC NA 32 JAK BEDA DWA KLUCZE
                 JOptionPane.showMessageDialog(null,
                         "Podano niepoprawny klucz, wpisana wartość musi składać się z dwóch kluczy o długości 8 bajtów każdy.\nObecnie ma długość: "
                                 + kluczTextField.getText().length(),"Ostrzeżenie",
@@ -218,7 +220,7 @@ public class GUI implements ActionListener, DocumentListener {
                 return;
             }
             else {
-                    klucz = kluczTextField.getText().getBytes(StandardCharsets.UTF_8);
+                klucz = hexToBytes((kluczHexString));
             }
         }
 
@@ -230,7 +232,7 @@ public class GUI implements ActionListener, DocumentListener {
                     break;
                 }
                 else {
-                        szyfr = szyfrogramTextArea.getText().getBytes(Charset.defaultCharset());
+                    szyfr = String.format("%x", new BigInteger(1, szyfrogramTextArea.getText().getBytes(Charset.defaultCharset()))).getBytes(Charset.defaultCharset());
                 }
                 break;
             }
@@ -241,7 +243,8 @@ public class GUI implements ActionListener, DocumentListener {
                     break;
                 }
                 else {
-                    tekst = tekstTextArea.getText().getBytes(Charset.defaultCharset());
+                    tekst = String.format("%x", new BigInteger(1, tekstTextArea.getText().getBytes(Charset.defaultCharset()))).getBytes(Charset.defaultCharset());
+
                 }
 
                 Key kluczyk = new Key(klucz);
@@ -251,13 +254,13 @@ public class GUI implements ActionListener, DocumentListener {
 
             case "Wybierz plik z tekstem":
             {
-                tekst = wczytajPlik(tekstTextArea);
+                tekst = String.format("%x", new BigInteger(1, wczytajPlik(tekstTextArea))).getBytes(Charset.defaultCharset());
                 break;
             }
 
             case "Wybierz plik z szyfrem":
             {
-                szyfr = wczytajPlik(szyfrogramTextArea);
+                szyfr = String.format("%x", new BigInteger(1, wczytajPlik(szyfrogramTextArea))).getBytes(Charset.defaultCharset());
                 break;
             }
         }
