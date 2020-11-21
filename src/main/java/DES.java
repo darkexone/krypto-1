@@ -28,7 +28,7 @@ public class DES {
             for (int j = 0; j < 64; j++) {
                 Key.setBit(block64bit_pom, j, Key.getBit(block64bit[i], IP[j] - 1));
             }
-            block64bit[i] = block64bit_pom; //TODO sprawdzic co sie stanie jak bedzie wiecej blokow i czy sa uwzglednione w dalszym algorytmie
+            block64bit[i] = block64bit_pom;
         }
 
         for (int i = 0; i < pom; i++) {
@@ -155,9 +155,9 @@ public class DES {
             33, 1, 41, 9, 49, 17, 57, 25};
 
     public byte[] PC3 = new byte[] {
-            32, 1, 2, 3, 4, 5,
-            4, 5, 6, 7, 8, 9,
-            8, 9, 10, 11, 12, 13,
+            32,  1,  2,  3,  4,  5,
+            4,   5,  6,  7,  8,  9,
+            8,   9, 10, 11, 12, 13,
             12, 13, 14, 15, 16, 17,
             16, 17, 18, 19, 20, 21,
             20, 21, 22, 23, 24, 25,
