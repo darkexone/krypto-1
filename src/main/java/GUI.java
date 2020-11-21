@@ -1,18 +1,20 @@
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class GUI implements ActionListener, DocumentListener {
     JFrame frame;
     JPanel panel;
 
     JLabel kluczLabel;
-    JTextField kluczText;
+    JTextField kluczTextField;
 
     JLabel tekstLabel;
     JScrollPane tekstScrollPane;
@@ -25,8 +27,8 @@ public class GUI implements ActionListener, DocumentListener {
     JButton selectSzyfrFileButton;
 
     public byte [] klucz;
-    public byte [] tekst;// = null;
-    public byte [] szyfr;// = null;
+    public byte [] tekst;
+    public byte [] szyfr;
     String pathToFile;
 
     JButton szyfrujButton;
@@ -56,11 +58,10 @@ public class GUI implements ActionListener, DocumentListener {
         kluczLabel = new JLabel("Klucz: ");
         kluczLabel.setBounds(23, 20, 80, 25);
         panel.add(kluczLabel);
-        //TODO wczytanie klucza
 
-        kluczText = new JTextField(20);
-        kluczText.setBounds(103,20,500,25);
-        panel.add(kluczText);
+        kluczTextField = new JTextField(20);
+        kluczTextField.setBounds(103,20,500,25);
+        panel.add(kluczTextField);
 
         // tekst
         tekstLabel = new JLabel("Tekst: ");
@@ -117,8 +118,6 @@ public class GUI implements ActionListener, DocumentListener {
     }
 
 
-
-
     public static void main(String [] args) {
         //GUI gui = new GUI();
         new GUI();
@@ -143,8 +142,6 @@ public class GUI implements ActionListener, DocumentListener {
             text = new byte[is.available()];
             is.read(text);
             is.close();
-            //System.out.println(new String(text));
-            //area.read( br, null );
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
@@ -175,7 +172,35 @@ public class GUI implements ActionListener, DocumentListener {
         mode = 0;
     }
 
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 3];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 3] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 3 + 1] = HEX_ARRAY[v & 0x0F];
+            hexChars[j * 3 + 2] = ' ';
+        }
+        return new String(hexChars);
+    }
+
+    public static byte[] hexToBytes(String tekst)
+    {
+        if (tekst == null) { return null;}
+        else if (tekst.length() < 2) { return null;}
+        else { if (tekst.length()%2!=0)tekst+='0';
+            int dl = tekst.length() / 2;
+            byte[] wynik = new byte[dl];
+            for (int i = 0; i < dl; i++)
+            { try {
+                wynik[i] = (byte) Integer.parseInt(tekst.substring(i * 2, i * 2 + 2), 16);
+            } catch(NumberFormatException e){
+                System.out.println("Problem z przekonwertowaniem HEX->BYTE.\n Sprawdź wprowadzone dane."); }
+            }
+            return wynik;
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -183,66 +208,57 @@ public class GUI implements ActionListener, DocumentListener {
         String s = e.getActionCommand();
 
         if (s == "DESZYFRUJ" || s == "SZYFRUJ") {
-            if (kluczText.getText().length()!=16) {
+            String kluczHexString = String.format("%x", new BigInteger(1, kluczTextField.getText().getBytes(Charset.defaultCharset())));
+            if (kluczHexString.length() != 16) {//TODO ZMIENIC NA 32 JAK BEDA DWA KLUCZE
                 JOptionPane.showMessageDialog(null,
-                        "Podano niepoprawny klucz, wpisana wartość musi składać się z dwóch kluczy o długości 8 bajtów.\nObecnie ma długość: "
-                                + kluczText.getText().length(),"Ostrzeżenie",
+                        "Podano niepoprawny klucz, wpisana wartość musi składać się z dwóch kluczy o długości 8 bajtów każdy.\nObecnie ma długość: "
+                                + kluczTextField.getText().length(),"Ostrzeżenie",
                         JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
             else {
-                try {
-                    klucz = kluczText.getText().getBytes("UTF-8");
-                    System.out.println(new String(klucz));
-                } catch (UnsupportedEncodingException unsupportedEncodingException) {
-                    unsupportedEncodingException.printStackTrace();
-                }
+                klucz = hexToBytes((kluczHexString));
             }
         }
 
+
         switch (s) {
+
             case "DESZYFRUJ": {
                 if (mode == 1) {
-                    return;
+                    break;
                 }
                 else {
-                    try {
-                        szyfr = szyfrogramTextArea.getText().getBytes("UTF-8");
-                    } catch (UnsupportedEncodingException unsupportedEncodingException) {
-                        unsupportedEncodingException.printStackTrace();
-                    }
+                    szyfr = String.format("%x", new BigInteger(1, szyfrogramTextArea.getText().getBytes(Charset.defaultCharset()))).getBytes(Charset.defaultCharset());
                 }
-                //System.out.println(new String(szyfr));
-                return;
+                break;
             }
+
             case "SZYFRUJ": {
-                if (mode != 0) {
-                    //System.out.println("true " + new String(tekst));
-                    return;
+
+                if (mode == 1) {
+                    break;
                 }
                 else {
-                    try {
-                        tekst = tekstTextArea.getText().getBytes("UTF-8");
-                    } catch (UnsupportedEncodingException unsupportedEncodingException) {
-                        unsupportedEncodingException.printStackTrace();
-                    }
+                    tekst = String.format("%x", new BigInteger(1, tekstTextArea.getText().getBytes(Charset.defaultCharset()))).getBytes(Charset.defaultCharset());
+
                 }
 
-                //System.out.println("false " + new String(tekst));
-                return;
+                Key kluczyk = new Key(klucz);
+                Subkeys podklucze = new Subkeys(kluczyk);
+                break;
             }
 
             case "Wybierz plik z tekstem":
             {
-                tekst = wczytajPlik(tekstTextArea);
-                System.out.println(new String(tekst));
-                return;
+                tekst = String.format("%x", new BigInteger(1, wczytajPlik(tekstTextArea))).getBytes(Charset.defaultCharset());
+                break;
             }
+
             case "Wybierz plik z szyfrem":
             {
-                szyfr = wczytajPlik(szyfrogramTextArea);
-                System.out.println(new String(szyfr));
-                return;
+                szyfr = String.format("%x", new BigInteger(1, wczytajPlik(szyfrogramTextArea))).getBytes(Charset.defaultCharset());
+                break;
             }
         }
     }
