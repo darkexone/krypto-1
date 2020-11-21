@@ -10,9 +10,6 @@ public class Subkeys {
             Key.setBit(this.c, i, Key.getBit(mainKey.get56Key(), i));
             Key.setBit(this.d, i, Key.getBit(mainKey.get56Key(), 28 + i));
         }
-
-        //System.out.println("Podklucz c:                    " + GUI.bytesToHex(c));
-        //System.out.println("Podklucz d:                    " + GUI.bytesToHex(d));
         for (int i = 0; i < 16; i++) {
             setSubKey(getShiftedAndJoinedSubKey56(i), i);
         }
