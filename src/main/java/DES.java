@@ -34,17 +34,21 @@ public class DES {
         //for (int = 0; )
 
         for (int i = 0; i < pom; i++) {
-            byte [] r0_pom = new byte[6];
-            for (int j = 0; j < 64; j++) {
-                Key.setBit(r0_pom, j, Key.getBit(block64bit[i], IP[i] - 1));
+            for (int j = 0; j < 4; j++) {
+                blocks32bit[i][0][j] = block64bit[i][j];
+                blocks32bit[i][1][j] = block64bit[i][j + 4];
             }
-            block64bit[i] = block64bit_pom;
+        }
+        byte [][] old = runda(blocks32bit[0][0], blocks32bit[0][1], 0);
+
+        for (int i = 1; i < 16; i++) {
+            old = runda(old[0],old[1],i);
         }
 
+        //TODO napisac permutacje po tablicy IPplus
+        //TODO klasa chyba powinna tez zwrocic tekst
     }
 
-    void runda (byte [] l, byte [] r, int runda) {
-        byte [] array48 = new byte[6];
     int XORint (byte x, int xpos, byte y, int ypos) {
         if ((x >> (7 - xpos) & 1) != (y >> (7 - ypos) & 1)) {
             return 1;
