@@ -52,18 +52,40 @@ public class DES {
             return 0;
         }
     }
+
+    byte[][] runda(byte[] l, byte[] r, int runda) {
+        byte[] array48 = new byte[6];
         for (int j = 0; j < 48; j++) {
             Key.setBit(array48, j, Key.getBit(r, PC3[j] - 1));
-            int ksor;
-            if (Key.getBit(array48, j) != Key.getBit(podklucze.getSubKey(runda),j)) {
-                ksor = 1;
-            }
-            else {
-                ksor = 0;
-            }
-            Key.setBit(array48, j, ksor);
+            Key.setBit(array48, j, XORint(array48[j / 8],j % 8, podklucze.getSubKey(runda)[j / 8],j %8 ));
         }
 
+        byte [] sboxtab = new byte[4];
+        for (int i = 0; i < 43; i += 6) {
+            byte [] x = new byte [1];
+            byte [] y = new byte [1];
+            Key.setBit(x,6, Key.getBit(array48,i + 0));
+            Key.setBit(x,7, Key.getBit(array48,i + 5));
+            Key.setBit(y,4, Key.getBit(array48,i + 1));
+            Key.setBit(y,5, Key.getBit(array48,i + 2));
+            Key.setBit(y,6, Key.getBit(array48,i + 3));
+            Key.setBit(y,7, Key.getBit(array48,i + 4));
+
+            for (int j = 4; j < 8; j++) {
+                Key.setBit(sboxtab, j, (SBoxes[i/6][x[0]][y[0]] >> (7 - j) & 1));
+            }
+        }
+
+        byte [][] out = new byte[2][4];
+        for (int i = 0; i < 4; i++) {
+            out [0][i] = r[i];
+        }
+
+        for (int i = 0; i < 32; i++) {
+            Key.setBit(out[1], i, XORint(l[i / 8],i % 8,sboxtab[i / 8],i % 8));
+        }
+
+        return out;
     }
 
     byte[] IP = new byte[] {
