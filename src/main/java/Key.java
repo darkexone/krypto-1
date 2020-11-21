@@ -14,15 +14,15 @@ public class Key {
         }
     }
 
-    public void set56Key(byte [] keyHEHE) {
-        this.key56 = keyHEHE;
+    public void set56Key(byte [] key56) {
+        this.key56 = key56;
     }
 
     public static int getBit(byte[] data, int pos) {
         int posByte = pos / 8;
         int posBit = pos % 8;
         byte valByte = data[posByte];
-        int valInt = valByte >> (7 - posBit) & 1; // dobra zarzutka
+        int valInt = valByte >> (7 - posBit) & 1;
         return valInt;
     }
 
@@ -30,7 +30,7 @@ public class Key {
         int posByte = pos / 8;
         int posBit = (7 - (pos % 8));
         if (oneOrZero == 1) {               // set 1
-            data[posByte] |= (1 << posBit); //TODO XDDDDDDDDDDDDDDD
+            data[posByte] |= (1 << posBit);
         }
         else {                              // set 0
             data[posByte] &= ~(1 << posBit);
