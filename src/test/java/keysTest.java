@@ -18,21 +18,14 @@ public class keysTest {
     @Test
     public void keysTest() {
 
-        String kluczString = "☺☻FF";
-        byte [] klucz = new byte[8];
-        for (int i = 0; i < 64; i++) {
-            if (i % 2 == 0) {
-                Key.setBit(klucz, i, 1);
-            } else {
-                Key.setBit(klucz, i, 1);
-            }
-        }
+        String kluczString = "FFFFFFFF";
+        byte [] klucz;
 
         //klucz = "☺☻♥♦♣♠•◘".getBytes(Charset.defaultCharset());
         String kluczHexString = String.format("%x", new BigInteger(1, kluczString.getBytes(Charset.defaultCharset())));
         System.out.println("Charset: " + Charset.defaultCharset());
-        //klucz = hexToBytes(("7F7F7F7F7F7F7F7F"));
-        klucz = GUI.hexToBytes((kluczHexString));
+        klucz = GUI.hexToBytes(("FFFFFFFFFFFFFFFF"));
+        //klucz = GUI.hexToBytes((kluczHexString));
 
         Key kluczyk = new Key(klucz);
         Subkeys podklucze = new Subkeys(kluczyk);
