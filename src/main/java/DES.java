@@ -45,6 +45,13 @@ public class DES {
 
     void runda (byte [] l, byte [] r, int runda) {
         byte [] array48 = new byte[6];
+    int XORint (byte x, int xpos, byte y, int ypos) {
+        if ((x >> (7 - xpos) & 1) != (y >> (7 - ypos) & 1)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
         for (int j = 0; j < 48; j++) {
             Key.setBit(array48, j, Key.getBit(r, PC3[j] - 1));
             int ksor;
