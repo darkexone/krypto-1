@@ -13,30 +13,12 @@ public class keysTest {
         System.out.println();
     }
 
-    public static byte[] hexToBytes(String tekst)
-    {
-        if (tekst == null) { return null;}
-        else if (tekst.length() < 2) { return null;}
-        else { if (tekst.length()%2!=0)tekst+='0';
-            int dl = tekst.length() / 2;
-            System.out.println("Dlugosc tekstu: " + tekst.length());
-            byte[] wynik = new byte[dl];
-            for (int i = 0; i < dl; i++)
-            { try{
-                wynik[i] = (byte) Integer.parseInt(tekst.substring(i * 2, i * 2 + 2), 16);
-            }catch(NumberFormatException e){
-                System.out.println("Problem z przekonwertowaniem HEX->BYTE.\n Sprawdź wprowadzone dane."); }
-            }
-            return wynik;
-        }
-    }
-
 
 
     @Test
     public void keysTest() {
 
-        //String kluczString = "☺☻♥♦♣♠•◘";
+        String kluczString = "☺☻FF";
         byte [] klucz = new byte[8];
         for (int i = 0; i < 64; i++) {
             if (i % 2 == 0) {
@@ -47,15 +29,16 @@ public class keysTest {
         }
 
         //klucz = "☺☻♥♦♣♠•◘".getBytes(Charset.defaultCharset());
+        String kluczHexString = String.format("%x", new BigInteger(1, kluczString.getBytes(Charset.defaultCharset())));
         System.out.println("Charset: " + Charset.defaultCharset());
-        klucz = hexToBytes(("7F7F7F7F7F7F7F7F"));
+        //klucz = hexToBytes(("7F7F7F7F7F7F7F7F"));
+        klucz = GUI.hexToBytes((kluczHexString));
 
         Key kluczyk = new Key(klucz);
         Subkeys podklucze = new Subkeys(kluczyk);
         //kluczyk.set56Key(podklucz);
 
         System.out.println("\nWczytany klucz z getBytes():   " + new String(klucz));
-        //klucz = hexToBytes(kluczText.getText());//TODO to powinno działać
         System.out.println("HEX klucz:                     " + GUI.bytesToHex(klucz));
         System.out.print("BIN klucz:                     ");
         printByteArray(klucz);
