@@ -26,7 +26,7 @@ public class DES {
         for (int i = 0; i < pom; i++) {
             byte [] block64bit_pom = new byte[8];
             for (int j = 0; j < 64; j++) {
-                Key.setBit(block64bit_pom, j, Key.getBit(block64bit[i], IP[i] - 1));
+                Key.setBit(block64bit_pom, j, Key.getBit(block64bit[i], IP[j] - 1));
             }
             block64bit[i] = block64bit_pom;
         }
