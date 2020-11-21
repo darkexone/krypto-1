@@ -58,7 +58,6 @@ public class GUI implements ActionListener, DocumentListener {
         kluczLabel = new JLabel("Klucz: ");
         kluczLabel.setBounds(23, 20, 80, 25);
         panel.add(kluczLabel);
-        //TODO wczytanie klucza
 
         kluczTextField = new JTextField(20);
         kluczTextField.setBounds(103,20,500,25);
@@ -192,7 +191,6 @@ public class GUI implements ActionListener, DocumentListener {
         else if (tekst.length() < 2) { return null;}
         else { if (tekst.length()%2!=0)tekst+='0';
             int dl = tekst.length() / 2;
-            System.out.println("Dlugosc tekstu: " + tekst.length());
             byte[] wynik = new byte[dl];
             for (int i = 0; i < dl; i++)
             { try {
@@ -203,7 +201,6 @@ public class GUI implements ActionListener, DocumentListener {
             return wynik;
         }
     }
-
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -248,7 +245,7 @@ public class GUI implements ActionListener, DocumentListener {
                 }
 
                 Key kluczyk = new Key(klucz);
-                Subkeys podklucze = new Subkeys(kluczyk); //TODO przekazywać klucz jako poprawną tablicę bajtów
+                Subkeys podklucze = new Subkeys(kluczyk);
                 break;
             }
 
