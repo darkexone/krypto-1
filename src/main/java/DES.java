@@ -1,13 +1,11 @@
-import java.util.ArrayList;
-
 public class DES {
 
-    byte [][] block64bit;
-    byte [][][] blocks32bit;
+    byte[][] block64bit;
+    byte[][][] blocks32bit;
     Subkeys podklucze;
-    byte [] tekst;
+    byte[] tekst;
 
-    public DES(Subkeys podklucze, byte [] tekst) {
+    public DES(Subkeys podklucze, byte[] tekst) {
         this.podklucze = podklucze;
         this.tekst = tekst;
 
@@ -22,16 +20,13 @@ public class DES {
                 }
             }
         }
-
         for (int i = 0; i < pom; i++) {
-            byte [] block64bit_pom = new byte[8];
+            byte[] block64bit_pom = new byte[8];
             for (int j = 0; j < 64; j++) {
                 Key.setBit(block64bit_pom, j, Key.getBit(block64bit[i], IP[j] - 1));
             }
-            block64bit[i] = block64bit_pom;
+            block64bit[i] = block64bit_pom; //TODO sprawdzic co sie stanie jak bedzie wiecej blokow i czy sa uwzglednione w dalszym algorytmie
         }
-
-        //for (int = 0; )
 
         for (int i = 0; i < pom; i++) {
             for (int j = 0; j < 4; j++) {
@@ -97,7 +92,7 @@ public class DES {
             60, 52, 44, 36, 28, 20, 12, 4,
             62, 54, 46, 38, 30, 22, 14, 6,
             64, 56, 48, 40, 32, 24, 16, 8,
-            57, 49, 41, 33, 25, 17, 9,  1,
+            57, 49, 41, 33, 25, 17, 9, 1,
             59, 51, 43, 35, 27, 19, 11, 3,
             61, 53, 45, 37, 29, 21, 13, 5,
             63, 55, 47, 39, 31, 23, 15, 7};
@@ -113,9 +108,9 @@ public class DES {
             33, 1, 41, 9, 49, 17, 57, 25};
 
     public byte[] PC3 = new byte[] {
-            32, 1,   2,  3,  4,  5,
-            4,  5,   6,  7,  8,  9,
-            8,  9,  10, 11, 12, 13,
+            32, 1, 2, 3, 4, 5,
+            4, 5, 6, 7, 8, 9,
+            8, 9, 10, 11, 12, 13,
             12, 13, 14, 15, 16, 17,
             16, 17, 18, 19, 20, 21,
             20, 21, 22, 23, 24, 25,
