@@ -18,7 +18,7 @@ public class DESTest {
         String kluczHexString = String.format("%x", new BigInteger(1, kluczString.getBytes(Charset.defaultCharset())));
         klucz = GUI.hexToBytes((kluczHexString));
 
-        String tekst = "chujdupaikamienikupa";
+        String tekst = "12345678";
         String tekstHexString = String.format("%x", new BigInteger(1, tekst.getBytes(Charset.defaultCharset())));
 
         Key kluczyk = new Key(klucz);
