@@ -244,6 +244,13 @@ public class GUI implements ActionListener, DocumentListener {
                     //szyfr = String.format("%x", new BigInteger(1, szyfrogramTextArea.getText().getBytes(Charset.defaultCharset()))).getBytes(Charset.defaultCharset());
                 }
 
+                if (szyfr == null || szyfr.length == 0) {
+                    JOptionPane.showMessageDialog(null,
+                            "Nie podano szyfru","Ostrzeżenie",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+
                 Key kluczyk = new Key(hexToBytes(klucz1));
                 Subkeys podklucze = new Subkeys(kluczyk);
 
@@ -263,6 +270,13 @@ public class GUI implements ActionListener, DocumentListener {
                 if (tekstMode == 0) {
                     tekst = hexToBytes(String.format("%x", new BigInteger(1, tekstTextArea.getText().getBytes(Charset.defaultCharset()))));
                     //tekst = String.format("%x", new BigInteger(1, tekstTextArea.getText().getBytes(Charset.defaultCharset()))).getBytes(Charset.defaultCharset());
+                }
+
+                if (tekst == null || tekst.length == 0) {
+                    JOptionPane.showMessageDialog(null,
+                            "Nie podano tekstu jawnego","Ostrzeżenie",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    return;
                 }
 
                 Key kluczyk = new Key(hexToBytes(klucz1));
