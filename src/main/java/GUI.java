@@ -250,10 +250,11 @@ public class GUI implements ActionListener, DocumentListener {
                 Key kluczyk2 = new Key(hexToBytes(klucz2));
                 Subkeys podklucze2 = new Subkeys(kluczyk2);
 
-                DES DES = new DES(podklucze, szyfr, 0);
-                DES DES2 = new DES(podklucze2, DES.getResult(), 1);
-                DES DES3 = new DES(podklucze,DES2.getResult(),0);
+                DES3 decryptor = new DES3(podklucze,podklucze2);
+                decryptor.decryption(szyfr);
 
+                String result = new String (decryptor.decryption(szyfr));
+                System.out.println(result);
                 break;
             }
 
@@ -262,6 +263,28 @@ public class GUI implements ActionListener, DocumentListener {
                 if (tekstMode == 0) {
                     tekst = hexToBytes(String.format("%x", new BigInteger(1, tekstTextArea.getText().getBytes(Charset.defaultCharset()))));
                     //tekst = String.format("%x", new BigInteger(1, tekstTextArea.getText().getBytes(Charset.defaultCharset()))).getBytes(Charset.defaultCharset());
+                }
+
+                Key kluczyk = new Key(hexToBytes(klucz1));
+                Subkeys podklucze = new Subkeys(kluczyk);
+
+                Key kluczyk2 = new Key(hexToBytes(klucz2));
+                Subkeys podklucze2 = new Subkeys(kluczyk2);
+
+                DES3 encryptor = new DES3(podklucze,podklucze2);
+                String result = bytesToHex(encryptor.encryption(tekst));
+                DES3 decryptor = new DES3(podklucze,podklucze2);
+                String result2 = bytesToHex(decryptor.decryption(hexToBytes(result)));
+                System.out.println("result:  " + result);
+                System.out.println("result2: " + result2);
+                System.out.println("tekst  : " + bytesToHex(tekst));
+
+                String input = bytesToHex(tekst).substring(0,500);
+                String output = result2.substring(0,500);
+                if (input == output) {
+                    JOptionPane.showMessageDialog(null,
+                            "IZI","Wygrałeś IPhone",
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
                 break;
             }
