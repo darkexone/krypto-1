@@ -205,14 +205,6 @@ public class GUI implements ActionListener, DocumentListener {
         }
     }
 
-    private void printByteArray(byte[] bytes) {
-        for (byte b1 : bytes) {
-            String s1 = String.format("%8s", Integer.toBinaryString(b1 & 0xFF)).replace(' ', '0');
-            System.out.print(s1 + " ");
-        }
-        System.out.println();
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
 
