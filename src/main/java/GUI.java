@@ -222,7 +222,7 @@ public class GUI implements ActionListener, DocumentListener {
 
         if (s == "DESZYFRUJ" || s == "SZYFRUJ") { //check key
             String kluczString = String.format("%x", new BigInteger(1, kluczTextField.getText().getBytes(Charset.defaultCharset())));
-            if (kluczString.length()*2 != 64) {
+            if (kluczString.length() != 64) {
                 JOptionPane.showMessageDialog(null,
                         "Podano niepoprawny klucz, wpisana wartość musi składać się z dwóch kluczy o długości 8 bajtów każdy (po 64 BITY).\nObecnie ma długość: "
                                 + kluczString.length()*2,"Ostrzeżenie",
