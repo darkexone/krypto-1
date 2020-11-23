@@ -1,3 +1,5 @@
+import jdk.swing.interop.SwingInterOpUtils;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -8,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 public class GUI implements ActionListener, DocumentListener {
     JFrame frame;
@@ -30,6 +34,8 @@ public class GUI implements ActionListener, DocumentListener {
     String klucz2;
     public byte [] tekst;
     public byte [] szyfr;
+    byte [] dlugoscTekstu;
+    byte [] dlugoscSzyfrogramu;
     String pathToFile;
 
     JButton szyfrujButton;
@@ -40,6 +46,8 @@ public class GUI implements ActionListener, DocumentListener {
     JFrame fileSelect = new JFrame();
     FileDialog fd = new FileDialog(fileSelect, "Choose a file", FileDialog.LOAD);
 
+    JFrame fileSave = new JFrame();
+    //JFileChooser
 
     public GUI () {
 
@@ -155,16 +163,29 @@ public class GUI implements ActionListener, DocumentListener {
         return text;
     }
 
-    public void insertUpdate(DocumentEvent e)
-    {
+    public void zapiszPlik(byte [] outputBinary) {
+        fd.setVisible(true);
+        String fileSource = fd.getDirectory() + fd.getFile();
+        File outputBinaryFile = new File(fileSource);
+        FileOutputStream outputFosBinary = null;
+        try {
+            outputFosBinary = new FileOutputStream(outputBinaryFile);
+            outputFosBinary.write(outputBinary);
+            outputFosBinary.close();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    public void insertUpdate(DocumentEvent e)  {
         Document s = e.getDocument();
 
         if (s == tekstTextArea.getDocument()) {
-            System.out.println("insertUpdate tekst");
+            //System.out.println("insertUpdate tekst");
             tekstMode = 0;
         }
         else if (s == szyfrogramTextArea.getDocument()) {
-            System.out.println("insertUpdate szyfr");
+            //System.out.println("insertUpdate szyfr");
             szyfrMode = 0;
         }
     }
@@ -205,6 +226,35 @@ public class GUI implements ActionListener, DocumentListener {
         }
     }
 
+    private void printByteArray(byte[] bytes) {
+        for (byte b1 : bytes) {
+            String s1 = String.format("%8s", Integer.toBinaryString(b1 & 0xFF)).replace(' ', '0');
+            System.out.print(s1 + " ");
+        }
+        System.out.println();
+    }
+
+    public static byte[] hexStringToByteArray(String hex) {
+        int l = hex.length();
+        byte[] data = new byte[l / 2];
+        for (int i = 0; i < l; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
+                    + Character.digit(hex.charAt(i + 1), 16));
+        }
+        return data;
+    }
+
+    public static byte[] asBytes (String s) {
+        String tmp;
+        byte[] b = new byte[s.length() / 2];
+        int i;
+        for (i = 0; i < s.length() / 2; i++) {
+            tmp = s.substring(i * 2, i * 2 + 2);
+            b[i] = (byte)(Integer.parseInt(tmp, 16) & 0xff);
+        }
+        return b;                                            //return bytes
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -212,7 +262,7 @@ public class GUI implements ActionListener, DocumentListener {
 
         if (s == "DESZYFRUJ" || s == "SZYFRUJ") { //check key
             String kluczString = String.format("%x", new BigInteger(1, kluczTextField.getText().getBytes(Charset.defaultCharset())));
-            if (kluczString.length() != 64) {
+            if (kluczString.length() != 32) {
                 JOptionPane.showMessageDialog(null,
                         "Podano niepoprawny klucz, wpisana wartość musi składać się z dwóch kluczy o długości 8 bajtów każdy (po 64 BITY).\nObecnie ma długość: "
                                 + kluczString.length()*2,"Ostrzeżenie",
@@ -230,8 +280,7 @@ public class GUI implements ActionListener, DocumentListener {
 
             case "DESZYFRUJ": {
                 if (szyfrMode == 0) {
-                    szyfr = hexToBytes(String.format("%x", new BigInteger(1, szyfrogramTextArea.getText().getBytes(Charset.defaultCharset()))));
-                    //szyfr = String.format("%x", new BigInteger(1, szyfrogramTextArea.getText().getBytes(Charset.defaultCharset()))).getBytes(Charset.defaultCharset());
+                    szyfr = hexToBytes(szyfrogramTextArea.getText().substring(1));
                 }
 
                 if (szyfr == null || szyfr.length == 0) {
@@ -241,6 +290,11 @@ public class GUI implements ActionListener, DocumentListener {
                     return;
                 }
 
+                //dlugoscSzyfrogramu = hexToBytes(String.format("%x", new BigInteger(1, szyfr)).substring(0, 2));
+
+                int liczbaBajtow = (((Byte)dlugoscSzyfrogramu[0]).intValue() - 48);
+                System.out.println(liczbaBajtow);
+
                 Key kluczyk = new Key(hexToBytes(klucz1));
                 Subkeys podklucze = new Subkeys(kluczyk);
 
@@ -248,10 +302,15 @@ public class GUI implements ActionListener, DocumentListener {
                 Subkeys podklucze2 = new Subkeys(kluczyk2);
 
                 DES3 decryptor = new DES3(podklucze,podklucze2);
-                decryptor.decryption(szyfr);
+                byte [] decryptionResult = decryptor.decryption(szyfr);
 
-                String result = new String (decryptor.decryption(szyfr));
-                System.out.println(result);
+                if (szyfrMode == 0) {
+                    String result = new String(decryptionResult);
+                    tekstTextArea.setText(result);
+                    break;
+                }
+                byte [] output = Arrays.copyOfRange(decryptionResult,0, decryptionResult.length-liczbaBajtow);
+                zapiszPlik(output);
                 break;
             }
 
@@ -259,8 +318,7 @@ public class GUI implements ActionListener, DocumentListener {
 
                 if (tekstMode == 0) {
                     tekst = hexToBytes(String.format("%x", new BigInteger(1, tekstTextArea.getText().getBytes(Charset.defaultCharset()))));
-                    //tekst = String.format("%x", new BigInteger(1, tekstTextArea.getText().getBytes(Charset.defaultCharset()))).getBytes(Charset.defaultCharset());
-                }
+                    }
 
                 if (tekst == null || tekst.length == 0) {
                     JOptionPane.showMessageDialog(null,
@@ -276,26 +334,37 @@ public class GUI implements ActionListener, DocumentListener {
                 Subkeys podklucze2 = new Subkeys(kluczyk2);
 
                 DES3 encryptor = new DES3(podklucze,podklucze2);
-                String result = bytesToHex(encryptor.encryption(tekst));
-                DES3 decryptor = new DES3(podklucze,podklucze2);
-                String result2 = bytesToHex(decryptor.decryption(hexToBytes(result)));
-                System.out.println("result:  " + result);
-                System.out.println("result2: " + result2);
-                System.out.println("tekst  : " + bytesToHex(tekst));
+                byte [] encryptionResult = encryptor.encryption(tekst);
 
-                String input = bytesToHex(tekst).substring(0,500);
-                String output = result2.substring(0,500);
-                if (input == output) {
-                    JOptionPane.showMessageDialog(null,
-                            "IZI","Wygrałeś IPhone",
-                            JOptionPane.INFORMATION_MESSAGE);
+                String bytesToDeleteString = String.valueOf(8 - (tekst.length % 8));
+
+                if (tekstMode == 0) {
+                    String result = bytesToHex(encryptionResult);
+                    szyfrogramTextArea.setText(bytesToDeleteString+result);
+                    break;
                 }
+
+                byte [] bytesToDeleteByte = hexToBytes(String.format("%x", new BigInteger(1, bytesToDeleteString.getBytes())));
+                fd.setVisible(true);
+                String fileSource = fd.getDirectory() + fd.getFile();
+
+                File outputFile = new File(fileSource);
+                FileOutputStream outputFos = null;
+                try {
+                    outputFos = new FileOutputStream(outputFile);
+                    outputFos.write(bytesToDeleteByte);
+                    outputFos.write(encryptionResult);
+                    outputFos.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+
                 break;
             }
 
             case "Wybierz plik z tekstem":
             {
-                tekst = hexToBytes(String.format("%x", new BigInteger(1, wczytajPlik())));
+                tekst = wczytajPlik();
                 tekstMode = 1;
                 break;
             }
@@ -303,7 +372,9 @@ public class GUI implements ActionListener, DocumentListener {
             case "Wybierz plik z szyfrem":
             {
                 //szyfr = String.format("%x", new BigInteger(1, wczytajPlik())).getBytes(Charset.defaultCharset());
-                szyfr = hexToBytes(String.format("%x", new BigInteger(1, wczytajPlik())));
+                byte [] szyfrFile = wczytajPlik();
+                dlugoscSzyfrogramu = GUI.hexToBytes(String.format("%x", new BigInteger(1, szyfrFile)).substring(0, 2));
+                szyfr = hexToBytes(String.format("%x", new BigInteger(1, szyfrFile)).substring(2));
                 szyfrMode = 1;
                 break;
             }
