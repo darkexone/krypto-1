@@ -279,8 +279,13 @@ public class GUI implements ActionListener, DocumentListener {
         switch (s) {
 
             case "DESZYFRUJ": {
+                int liczbaBajtow = 0;
                 if (szyfrMode == 0) {
                     szyfr = hexToBytes(szyfrogramTextArea.getText().substring(1));
+                    liczbaBajtow = Integer.valueOf(szyfrogramTextArea.getText().substring(0,1));
+                }
+                else {
+                    liczbaBajtow = (((Byte)dlugoscSzyfrogramu[0]).intValue() - 48);
                 }
 
                 if (szyfr == null || szyfr.length == 0) {
@@ -292,7 +297,7 @@ public class GUI implements ActionListener, DocumentListener {
 
                 //dlugoscSzyfrogramu = hexToBytes(String.format("%x", new BigInteger(1, szyfr)).substring(0, 2));
 
-                int liczbaBajtow = (((Byte)dlugoscSzyfrogramu[0]).intValue() - 48);
+
                 System.out.println(liczbaBajtow);
 
                 Key kluczyk = new Key(hexToBytes(klucz1));
